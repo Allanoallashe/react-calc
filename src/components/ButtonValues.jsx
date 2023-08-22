@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 const btnValues = [
   'C', 'sin', 'cos', 'tan', 'log', 'sqrt', '^','OFF',
@@ -9,6 +9,42 @@ const btnValues = [
   ]
 
 const ButtonValues = ({ setDisplayValue, displayValue }) => {
+
+  const [keyBuffer, setKeyBuffer] = useState('');
+
+const handleKeyDown = (event) => {
+  const key = event.key;
+
+  if (/^[0-9]$/.test(key)) {
+    event.preventDefault();
+    handleButtonClick(key);
+  } else if (/^[+\-*/^.]$/.test(key)) {
+    event.preventDefault();
+    if (!isNaN(displayValue.slice(-1))) {
+      handleButtonClick(key);
+    }
+  } else if (key === 'Enter') {
+    event.preventDefault();
+    handleButtonClick('=');
+  } else if (key === 'Backspace') {
+    event.preventDefault();
+    if (displayValue.length > 0) {
+      setDisplayValue(displayValue.slice(0, -1));
+      setKeyBuffer(keyBuffer.slice(0, -1)); // Remove the last character from keyBuffer
+    }
+  }
+
+  // Don't set the keyBuffer here
+};
+
+  
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [keyBuffer]);
   
 const handleButtonClick = (value) => {
   if (value === '=') {
@@ -34,7 +70,7 @@ const handleButtonClick = (value) => {
   } else if (value === '^') {
     setDisplayValue(displayValue + '^');
   } else if (['+', '-', '*', '/'].includes(value)) {
-    if (!isNaN(displayValue.slice(-1))) {
+    if (!isNaN(keyBuffer) && !isNaN(displayValue.slice(-1))) {
       setDisplayValue(displayValue + value);
     }
   } else if (value === 'OFF') {
@@ -48,7 +84,16 @@ const handleButtonClick = (value) => {
       setDisplayValue(displayValue + value);
     }
   }
+
+  if (/^[0-9]$/.test(value)) {
+    setKeyBuffer(keyBuffer + value); // Add numeric key to buffer
+  } else {
+    setKeyBuffer(''); // Clear the buffer for non-numeric keys
+  }
 };
+
+
+
 
 
 

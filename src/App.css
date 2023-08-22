@@ -43,5 +43,7 @@ body{
   cursor: n-resize;
   padding: 14px 6px 14px 6px;
   color: #000000;
+  font-weight: bold;
+  font-size: 20px;
   border-radius: 3px;
 }
