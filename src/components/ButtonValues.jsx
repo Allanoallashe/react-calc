@@ -11,6 +11,7 @@ const btnValues = [
 const ButtonValues = ({ setDisplayValue, displayValue }) => {
 
   const [keyBuffer, setKeyBuffer] = useState('');
+  const [lastKeyPressed, setLastKeyPressed] = useState('');
 
 const handleKeyDown = (event) => {
   const key = event.key;
@@ -68,7 +69,11 @@ const handleButtonClick = (value) => {
   } else if (value === 'sqrt') {
     setDisplayValue(formatResult(Math.sqrt(parseFloat(displayValue))));
   } else if (value === '^') {
-    setDisplayValue(displayValue + '^');
+    if (!isNaN(displayValue) && !isNaN(keyBuffer)) {
+      const result = Math.pow(parseFloat(displayValue), parseFloat(keyBuffer));
+      setDisplayValue(formatResult(result));
+    }
+    setKeyBuffer('');
   } else if (['+', '-', '*', '/'].includes(value)) {
     if (!isNaN(keyBuffer) && !isNaN(displayValue.slice(-1))) {
       setDisplayValue(displayValue + value);
@@ -76,7 +81,7 @@ const handleButtonClick = (value) => {
   } else if (value === 'OFF') {
     setDisplayValue('');
   } else {
-    if (displayValue === '0' || displayValue === 'Error') {
+    if (displayValue === '0' || displayValue === 'Error' || lastKeyPressed === '=') {
       setDisplayValue(value);
     } else if (value === '.' && displayValue.includes('.')) {
       return;
@@ -90,7 +95,11 @@ const handleButtonClick = (value) => {
   } else {
     setKeyBuffer(''); // Clear the buffer for non-numeric keys
   }
+  
+  setLastKeyPressed(value); // Update the last key pressed
 };
+
+
 
 
 
